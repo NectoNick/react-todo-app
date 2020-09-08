@@ -19,20 +19,8 @@ type Props = OwnProps & ObservableStateToProps<typeof mapStateToProps>;
 
 const mapStateToProps = (state$: MapState$, props: OwnProps) => ({
   rowModel: state$.pipe(
-    // startWith<any>([]),
-    // pairwise(),
-    // tap(val => {debugger}),
-    // map(([prev, curr]) => curr),
     map<MapState, TodoModel>(([, props]) => props.model),
-
     distinctUntilChanged(),
-    startWith<any>({}),
-    pairwise<any>(),
-    tap(([prev, next]) => {debugger}),
-    //distinctUntilKeyChanged('done'),
-    // scan((b, b1) => { debugger; return b1; }),
-    // tap(val => {debugger}),
-    map(([prev, next]) => next),
     map<TodoModel, TodoRowModel>(({ description, done, date }) => ({
       description,
       done: done ? 'yes' : 'no',

@@ -1,43 +1,38 @@
 import * as React from 'react';
-import { of, merge } from 'rxjs';
-import { debounceTime, delay, distinctUntilChanged, map, skip, switchMap, throttleTime } from 'rxjs/operators';
+import { connect } from 'react-redux';
+import { createSelector } from 'reselect';
 
 import './TodoBadgeComponent.scss';
-import { observableConnect, ObservableStateToProps, MapState$ } from '../../utils';
+import { RootState } from '../../store/root-state';
 
 
 type OwnProps = {
   count: number;
   className?: string;
 }
-type Props = OwnProps & ObservableStateToProps<typeof mapStateToProps>;
+type Props = OwnProps & ReturnType<typeof mapStateToProps>;
 
-const mapStateToProps = (state$: MapState$, props: OwnProps) => ({
-  animate: state$.pipe(
-    map(([, props]) => props.count),
-    distinctUntilChanged(),
-    skip(1),
-    switchMap((count) => merge(
-      of(count % 2 === 0 ? 'animation' : 'nextAnimation')
-    ))
-  )
-});
+const mapStateToProps = (state: RootState, ownProps: OwnProps) => {
+  const animationClassSelector = createSelector(
+    (props: OwnProps) => props.count,
+    count => count % 2 === 0 ? 'animation' : 'nextAnimation' // this small hack is need to rerun animation
+  );
+  return {
+    animationClass: animationClassSelector(ownProps)
+  };
+};
 
-class TodoBadgeComponent extends React.Component<Props> {
-
-  render() {
-    const { count, animate, className } = this.props;
-    return (
-      <span className="badge-container">
-        <span className={ `badge ${animate} ${className}` }
-              data-bind-class-name="addedClass">
-          { count }
-        </span>
+function TodoBadgeComponent({ count, animationClass, className }: Props) {
+  return (
+    <span className="badge-container">
+      <span className={ `badge ${animationClass} ${className}` }
+            data-bind-class-name="addedClass">
+        { count }
       </span>
-    );
-  }
+    </span>
+  );
 }
 
-export default observableConnect(
+export default connect(
   mapStateToProps
 )(TodoBadgeComponent);
