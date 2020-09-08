@@ -1,0 +1,30 @@
+.todo-table-container {
+  display: inline-block;
+  overflow: auto;
+  padding: 3px 15px;
+  margin: 15px 0;
+
+  .todo-table {
+    display: table;
+    position: relative;
+    width: 100%;
+    table-layout: fixed;
+
+    .heading {
+      display: table-row;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .cell {
+      display: table-cell;
+      border: solid;
+      border-width: thin;
+      padding-left: 5px;
+      padding-right: 5px;
+      min-width: 190px;
+      text-align: center;
+    }
+  }
+
+}

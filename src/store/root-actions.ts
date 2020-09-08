@@ -9,9 +9,15 @@ export const switchMode = createAction(
   // (mode: boolean): boolean => !mode
 )();
 
+export const switchLightMode = createAction(
+  'SWITCH_LIGHT_MODE',
+  // (mode: boolean): boolean => !mode
+)();
+
 const rootActions = {
   router: routerActions,
   switchMode,
+  switchLightMode,
   todo: todoActions,
 };
 
