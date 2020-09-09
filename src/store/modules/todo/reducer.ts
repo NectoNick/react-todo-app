@@ -1,21 +1,14 @@
 import { combineReducers } from 'redux';
 import { createReducer } from 'typesafe-actions';
 
-import { /*loadTodosAsync,*/ addTodo, removeTodo } from './actions';
+import { createTodo, removeTodo, removeTodos } from './actions';
 import { initialState, State } from './state';
 
 
-// export const isLoadingTodos = createReducer(false as boolean)
-//   .handleAction([loadTodosAsync.request], (state, action) => true)
-//   .handleAction(
-//     [loadTodosAsync.success, loadTodosAsync.failure],
-//     (state, action) => false
-//   );
-
 const todos = createReducer(initialState.todos)
-  .handleAction(addTodo, (state, action) => [...state, action.payload]);
+  .handleAction(createTodo, (todos, { payload }) => [...todos, payload])
+  .handleAction(removeTodos, () => []);
 
 export const todoReducer = combineReducers<State>({
-  // isLoadingTodos,
   todos,
 });

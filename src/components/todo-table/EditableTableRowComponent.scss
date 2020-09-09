@@ -31,7 +31,6 @@
     animation-duration: 1.75s;
     animation-name: toGreen;
   }
-
   @keyframes toRed {
     from { background-color: rgba(255,0,26,0.05) }
     to { background-color: initial }

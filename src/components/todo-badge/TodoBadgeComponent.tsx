@@ -1,38 +1,26 @@
 import * as React from 'react';
-import { connect } from 'react-redux';
-import { createSelector } from 'reselect';
+import { createCachedSelector } from 're-reselect';
 
 import './TodoBadgeComponent.scss';
-import { RootState } from '../../store/root-state';
 
 
 type OwnProps = {
   count: number;
   className?: string;
 }
-type Props = OwnProps & ReturnType<typeof mapStateToProps>;
 
-const mapStateToProps = (state: RootState, ownProps: OwnProps) => {
-  const animationClassSelector = createSelector(
-    (props: OwnProps) => props.count,
-    count => count % 2 === 0 ? 'animation' : 'nextAnimation' // this small hack is need to rerun animation
-  );
-  return {
-    animationClass: animationClassSelector(ownProps)
-  };
-};
+const getAnimationClass = createCachedSelector(
+  (count: OwnProps['count'], casheKey: string) => count,
+  count => count % 2 === 0 ? 'animation' : 'nextAnimation' // this small hack is need to rerun animation
+)((s, name) => name);
 
-function TodoBadgeComponent({ count, animationClass, className }: Props) {
+export default function TodoBadgeComponent({ count, className = 'blue' }: OwnProps) {
   return (
     <span className="badge-container">
-      <span className={ `badge ${animationClass} ${className}` }
-            data-bind-class-name="addedClass">
+      {/*className used here as a unique key for cashing selector but it is unsafe and must be changed when it will be need*/}
+      <span className={ `badge ${getAnimationClass(count, className)} ${className}` }>
         { count }
       </span>
     </span>
   );
 }
-
-export default connect(
-  mapStateToProps
-)(TodoBadgeComponent);

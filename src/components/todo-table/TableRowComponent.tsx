@@ -1,9 +1,11 @@
 import * as React from 'react';
-import { distinctUntilChanged, distinctUntilKeyChanged, map, pairwise, scan, startWith, tap } from 'rxjs/operators';
+import { connect } from 'react-redux';
 
 import './TableRowComponent.scss';
 import { TodoModel } from '../../models';
-import { MapState, MapState$, observableConnect, ObservableStateToProps, DateFormatService } from '../../utils';
+import { DateFormatService } from '../../utils';
+import { createSelector } from 'reselect';
+import { RootState } from '../../store/root-state';
 
 
 interface TodoRowModel {
@@ -11,28 +13,42 @@ interface TodoRowModel {
   done: 'yes' | 'no',
   date: string,
 }
-
 type OwnProps = {
   model: TodoModel;
 }
-type Props = OwnProps & ObservableStateToProps<typeof mapStateToProps>;
+type Props = OwnProps & ReturnType<ReturnType<typeof mapStateToProps>>;
 
-const mapStateToProps = (state$: MapState$, props: OwnProps) => ({
-  rowModel: state$.pipe(
-    map<MapState, TodoModel>(([, props]) => props.model),
-    distinctUntilChanged(),
-    map<TodoModel, TodoRowModel>(({ description, done, date }) => ({
-      description,
-      done: done ? 'yes' : 'no',
-      date: date ? DateFormatService.getDate(date) : ''
-    })),
-  )
-});
+const getRowModel = createSelector(
+  ({ model }: OwnProps) => model,
+  ({ description, done, date }): TodoRowModel => ({
+    description,
+    done: done ? 'yes' : 'no',
+    date: date ? DateFormatService.getDate(date) : ''
+  })
+);
+
+// const getRowModelFactory = () => createSelector(
+//   ({ model }: OwnProps) => model,
+//   ({ description, done, date }): TodoRowModel => ({
+//     description,
+//     done: done ? 'yes' : 'no',
+//     date: date ? DateFormatService.getDate(date) : ''
+//   })
+// );
+
+const mapStateToProps = () => {
+  // const getRowModell = getRowModelFactory();
+
+  return (state: RootState, props: OwnProps) => ({
+    // rowModel: getRowModell(props)
+  });
+};
 
 class TableRowComponent extends React.Component<Props> {
 
   render() {
-    const { rowModel } = this.props;
+    const rowModel = getRowModel(this.props);
+
     return (
       <div className="table-row"
            data-bind-click="rowClicked">
@@ -50,6 +66,6 @@ class TableRowComponent extends React.Component<Props> {
   }
 }
 
-export default observableConnect(
+export default connect(
   mapStateToProps
 )(TableRowComponent);

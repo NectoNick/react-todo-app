@@ -1,8 +1,9 @@
 import * as React from 'react';
-import { first, map } from 'rxjs/operators';
+import { connect } from 'react-redux';
+import { createSelector } from 'reselect';
 
 import './EditableTableRowComponent.scss';
-import { observableConnect, ObservableStateToProps, MapState$ } from '../../utils';
+import { RootState } from '../../store/root-state';
 import { TodoModel } from '../../models';
 import TodoButton from '../todo-button/TodoButtonComponent';
 import TableRow from '../todo-table/TableRowComponent';
@@ -11,31 +12,28 @@ import TableRow from '../todo-table/TableRowComponent';
 type OwnProps = {
   model: TodoModel;
 }
-type Props = OwnProps & ObservableStateToProps<typeof mapStateToProps>;
+type Props = OwnProps & ReturnType<ReturnType<typeof mapStateToProps>>;
 
-// @bindable<string>((self) => self.model.pipe(
-//     first(),
-//     switchMap(({ done }) => merge(
-//       of(done ? 'green' : 'red'),
-//       of('').pipe(delay(500)),
-//     )),
-//   ))
-//   newRowBackgroundColor!: Bindable<string>;
+const makeNewRowBgColorSelector = () => createSelector(
+  ({ model }: OwnProps) => model,
+  model => model.done ? 'green' : 'red'
+);
 
-const mapStateToProps = (state$: MapState$, props: OwnProps) => ({
-  newRowBackgroundColor: state$.pipe(
-    map(([, props]) => props.model),
-    first(),
-    map(model => model.done ? 'green' : 'red')
-  )
-});
+const mapStateToProps = () => {
+  const newRowBgColorSelector = makeNewRowBgColorSelector();
+
+  return (state: RootState, props: OwnProps) => ({
+    newRowBgColor: newRowBgColorSelector(props)
+  });
+};
+
 
 class EditableTableRowComponent extends React.Component<Props> {
 
   render() {
-    const { model, newRowBackgroundColor } = this.props;
+    const { model, newRowBgColor } = this.props;
     return (
-      <div className={ `editable-table-row-container ${newRowBackgroundColor}` }
+      <div className={ `editable-table-row-container ${newRowBgColor}` }
            data-bind-class="{ 'edit-mode': 'editMode', 'edit-mode-popup': 'editModeAnimate' }"
            data-bind-class-name="newRowBackgroundColor">
 
@@ -47,6 +45,6 @@ class EditableTableRowComponent extends React.Component<Props> {
   }
 }
 
-export default observableConnect(
+export default connect(
   mapStateToProps
 )(EditableTableRowComponent);

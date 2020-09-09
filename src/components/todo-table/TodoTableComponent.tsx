@@ -1,21 +1,20 @@
 import * as React from 'react';
-import { map } from 'rxjs/operators';
+import { connect } from 'react-redux';
+import { createSelector } from 'reselect';
 
 import './TodoTableComponent.scss';
-import { observableConnect, ObservableStateToProps, MapState$ } from '../../utils';
 import { TodoModel } from '../../models';
+import { RootState } from '../../store/root-state';
 import EditableTableRow from './EditableTableRowComponent';
 
 
 type OwnProps = {
   rows: TodoModel[];
 }
-type Props = OwnProps & ObservableStateToProps<typeof mapStateToProps>;
+type Props = OwnProps & ReturnType<typeof mapStateToProps>;
 
-const mapStateToProps = (state$: MapState$, props: OwnProps) => ({
-  pluralEnding: state$.pipe(
-    map(([state, props]) => props.count === 1 ? '' : 's')
-  )
+const mapStateToProps = (state: RootState, props: OwnProps) => ({
+
 });
 
 class TodoTableComponent extends React.Component<Props> {
@@ -27,7 +26,7 @@ class TodoTableComponent extends React.Component<Props> {
 
         <div className="todo-table">
 
-          <div className="heading">
+          <div className="heading"> {/* TODO use TableRow instead */}
             <div className="cell">
               <p>Description</p>
             </div>
@@ -42,7 +41,8 @@ class TodoTableComponent extends React.Component<Props> {
           {
             this.props.rows.map((row, index) =>
 
-              <EditableTableRow model={row} />
+              <EditableTableRow key={ index }
+                                model={row} />
             )
           }
         </div>
@@ -52,6 +52,6 @@ class TodoTableComponent extends React.Component<Props> {
   }
 }
 
-export default observableConnect(
+export default connect(
   mapStateToProps
 )(TodoTableComponent);

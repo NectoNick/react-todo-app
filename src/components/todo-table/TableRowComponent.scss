@@ -1,13 +1,3 @@
 .table-row {
   display: table-row;
-
-  .cell {
-    display: table-cell;
-    border: solid;
-    border-width: thin;
-    padding-left: 5px;
-    padding-right: 5px;
-    min-width: 190px;
-    text-align: center;
-  }
 }

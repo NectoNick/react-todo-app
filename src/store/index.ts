@@ -1,36 +1,9 @@
-import { createStore/*, applyMiddleware*/ } from 'redux';
-// import { createEpicMiddleware } from 'redux-observable';
-// import { RootAction, RootState, Services } from 'typesafe-actions';
+import { createStore } from 'redux';
 
-// import { composeEnhancers } from './utils';
 import { rootReducer } from './root-reducer';
 import { initialState } from './root-state';
 
-// import rootEpic from './root-epic';
-// import services from '../services';
 
-// export const epicMiddleware = createEpicMiddleware<
-//   RootAction,
-//   RootAction,
-//   RootState,
-//   Services
-// >({
-//   dependencies: services,
-// });
+const store = createStore(rootReducer, initialState);
 
-// configure middlewares
-// const middlewares = [epicMiddleware];
-
-// compose enhancers
-// const enhancer = composeEnhancers(applyMiddleware(...middlewares));
-
-// rehydrate state on app start
-// const initialState = {};
-
-// create store
-const store = createStore(rootReducer, initialState /*, enhancer*/);
-
-// epicMiddleware.run(rootEpic);
-
-// export store singleton instance
 export { store };

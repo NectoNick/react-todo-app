@@ -2,11 +2,6 @@
   "name": "todo-app",
   "version": "0.1.0",
   "private": true,
-  "devDependencies": {
-    "@types/react-redux": "^7.1.9",
-    "react-redux-typescript-scripts": "^1.6.2",
-    "utility-types": "^3.10.0"
-  },
   "dependencies": {
     "@babel/core": "7.9.0",
     "@svgr/webpack": "4.3.3",
@@ -17,6 +12,7 @@
     "@types/node": "^12.0.0",
     "@types/react": "^16.9.0",
     "@types/react-dom": "^16.9.0",
+    "@types/react-redux": "^7.1.9",
     "@types/react-router-redux": "^5.0.18",
     "@typescript-eslint/eslint-plugin": "^2.10.0",
     "@typescript-eslint/parser": "^2.10.0",
@@ -55,11 +51,13 @@
     "postcss-normalize": "8.0.1",
     "postcss-preset-env": "6.7.0",
     "postcss-safe-parser": "4.0.1",
+    "re-reselect": "^4.0.0",
     "react": "^16.13.1",
     "react-app-polyfill": "^1.0.6",
     "react-dev-utils": "^10.2.1",
     "react-dom": "^16.13.1",
     "react-redux": "^7.2.1",
+    "react-redux-typescript-scripts": "^1.6.2",
     "react-router-redux": "^4.0.8",
     "redux": "^4.0.5",
     "reselect": "^4.0.0",

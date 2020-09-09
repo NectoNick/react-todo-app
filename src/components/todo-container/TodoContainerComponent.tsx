@@ -1,118 +1,125 @@
 import * as React from 'react';
-import { connect, MapDispatchToProps } from 'react-redux';
-import { BehaviorSubject, combineLatest, merge, Observable, of, Subject } from 'rxjs';
-import { distinctUntilChanged, map, withLatestFrom } from 'rxjs/operators';
+import { connect} from 'react-redux';
+import { createSelector } from 'reselect';
 
 import './TodoContainerComponent.scss';
-
+import { RootState } from '../../store/root-state';
 import { switchMode } from '../../store/root-actions';
-import { addTodo } from '../../store/modules/todo/actions';
-import { observableConnect, ObservableStateToProps, MapState$ } from '../../utils';
+import { createTodo, removeTodos } from '../../store/modules/todo/actions';
+import * as selectors from '../../store/modules/todo/selectors';
+import { FormInputModel, TodoModel } from '../../models';
 import TodoButton from '../todo-button/TodoButtonComponent';
 import TableCaption from '../table-caption/TableCaptionComponent';
 import TodoTable from '../todo-table/TodoTableComponent';
-import TodoBadge from '../todo-badge/TodoBadgeComponent';
+import Badge from '../todo-badge/TodoBadgeComponent';
+import Form from '../form/FormComponent';
 
 
 type OwnProps = {
   className?: string;
 }
+type Props = OwnProps & ReturnType<typeof mapStateToProps> & typeof mapActionsToProps;
+type TodoForm = [FormInputModel<keyof TodoModel>, FormInputModel<keyof TodoModel>]
+type State = {
+  todo: TodoModel;
+}
 
-type Props = OwnProps & ObservableStateToProps<typeof mapStateToProp> & typeof mapActionsToProps;
+const getTodoForm = createSelector(
+  (todo: TodoModel) => todo,
+  (todo): TodoForm => [
+    { type: 'text', label: 'Description', value: todo.description, name: 'description' },
+    { type: 'checkbox', label: 'Is done', value: todo.done, name: 'done' }
+  ]
+);
 
-const mapStateToProp = (state$: MapState$, props: OwnProps) => {
-  const todoList = state$.pipe(
-    map(([{ todo: { todos } }]) => todos),
-    distinctUntilChanged()
-  );
-  const todoListTotal = todoList.pipe(map(({ length }) => length));
-  const todoListDone = todoList.pipe(map(list => list.filter(({ done }) => done).length));
-
+const mapStateToProps = ({ darkMode, todo }: RootState, props: OwnProps) => {
   return {
-    darkMode: state$.pipe(map(([state]) => state.darkMode)),
-    lightMode: state$.pipe(map(([state]) => state.lightMode)),
-    todoList,
-    todoListTotal,
-    todoListDone,
-    todoListLeft: todoList.pipe(
-      withLatestFrom(todoListTotal, todoListDone),
-      map(([, total, done]) => total - done),
-    )
+    darkMode: darkMode,
+    todoList: selectors.getTodoList(todo),
+    todoListTotal: selectors.getTodoListTotal(todo),
+    todoListDone: selectors.getTodoListDone(todo),
+    todoListLeft: selectors.getTodoListLeft(todo),
   };
 };
 
 const mapActionsToProps = {
   switchMode,
-  addTodo
+  createTodo,
+  removeTodos
 };
 
-class TodoContainerComponent extends React.Component<Props> {
+class TodoContainerComponent extends React.Component<Props, State> {
 
-  switchMode = () => {
-    // debugger
-    this.props.switchMode();
+  readonly defaultTodo = {
+    description: '',
+    done: false,
+    date: null
   };
 
-  addTodo(): void {
-    // this.setState({ todos: 1 });
-    this.props.addTodo({
-      description: '',
-      done: false,
-      removed: false
-    })
-  }
+  readonly state = {
+    todo: { ...this.defaultTodo }
+  };
+
+  createTodo = (): void => {
+    this.props.createTodo(this.state.todo);
+    this.setState({ todo: { ...this.defaultTodo } });
+  };
+
+  changeTodo = (partialTodo: Partial<TodoModel>): void => {
+    this.setState({ todo: { ...this.state.todo, ...partialTodo } });
+  };
 
   render() {
-    const { darkMode, todoListTotal, todoList, todoListDone, todoListLeft } = this.props;
-
+    const { darkMode, todoListTotal, todoList, todoListDone, todoListLeft, switchMode, removeTodos } = this.props;
     return (
-
       <div className={ `container ${ darkMode ? 'dark' : '' }` }>
 
         <TodoButton className="top-button"
-                    label={ 'Click to change background 1' }
-                    clicked={ () => this.switchMode() }
+                    label="Click to change background"
+                    clicked={ switchMode }
         />
 
         <TableCaption count={ todoListTotal } />
 
-        { !todoListTotal && <div className="table-placeholder">Nothing to show</div> }
+        {
+          !todoListTotal
+            ? <div className="table-placeholder">Nothing to show</div>
+            : <div className="table-section">
+                <div className="side-area"></div>
+                <div className="center-area">
+                  <TodoTable rows={ todoList }
+                             data-bind-updated="todoUpdated"
+                  />
+                </div>
+                <div className="counters side-area">
+                  <div>
+                    Done: <Badge className="green"
+                                 count={ todoListDone }
+                          />
+                  </div>
+                  <div>
+                    Left: <Badge className="red"
+                                 count={ todoListLeft }
+                          />
+                  </div>
+                </div>
+              </div>
+        }
 
-
-        <div className="table-section"
-             data-bind-if="todoListTotal">
-          <div className="side-area"></div>
-          <div className="center-area">
-            <TodoTable rows={ todoList }
-                       data-bind-updated="todoUpdated"
-            />
-          </div>
-          <div className="counters side-area">
-            <div>
-              Done: <TodoBadge count={ todoListDone } />
-            </div>
-            <div>
-              Left: <TodoBadge className="red"
-                               count={ todoListLeft }
-                    />
-            </div>
-          </div>
-        </div>
-
-        {/*<todo-form data-bind-model="todoForm"
-                   data-bind-changed="todoFormChanged">
-        </todo-form>*/}
+        <Form model={ getTodoForm(this.state.todo) }
+              changed={ this.changeTodo }
+        />
 
         <TodoButton className="todo-button"
-                    label={'Create'}
-                    clicked={ () => { this.addTodo() /*createTodoButtonClicked*/ }}
+                    label="Create"
+                    clicked={ this.createTodo }
         />
 
         {
-          todoListTotal &&
+          !!todoListTotal &&
           <TodoButton className="todo-button"
-                      label={ 'Remove all' }
-                      clicked={ () => { /*removeAllButtonClicked*/ } }
+                      label="Remove all"
+                      clicked={ removeTodos }
           />
         }
       </div>
@@ -120,56 +127,7 @@ class TodoContainerComponent extends React.Component<Props> {
   }
 }
 
-export default observableConnect(
-  mapStateToProp,
+export default connect(
+  mapStateToProps,
   mapActionsToProps
 )(TodoContainerComponent)
-
-
-// const mapStateToProps = (state: RootState, props: OwnProps) => {
-//   debugger
-//   return {
-//     darkMode: state.darkMode,
-//     lightMode: state.lightMode,
-//     todoList: state.todo.todos
-//   }
-// };
-
-// export default connect(
-//   mapStateToProps,
-//   mapActionsToProps
-// )(TodoContainerComponent);
-
-// type ObservableProps = Record<string, Observable<unknown>>;
-//
-// function observableConnect(
-//   mapObservableStateToProps: (state$: Observable<RootState>) => ObservableProps
-// ): (state: RootState, props: any) => any {
-//   const state$: Subject<RootState> = new Subject();
-//   const observableProps: ObservableProps = mapObservableStateToProps(state$.asObservable());
-//   const observablePropsKeys = Object.keys(observableProps);
-//   let result: any = {};
-//   combineLatest(Object.values(observableProps)).subscribe((values) => {
-//     result = values.reduce((acc: any, value, index) => {
-//       return { ...acc, [observablePropsKeys[index]]: value };
-//     }, {});
-//   });
-//
-//   return (state: RootState, props: any) => {
-//     state$.next(state);
-//     return result;
-//   }
-// }
-
-// const mapStateToProps = (state: RootState, a: any) => {
-//   return {
-//     darkMode: state.darkMode,
-//   };
-// };
-//
-// const cClass = connect(
-//   mapStateToProps,
-//   mapActionsToProps
-// )(TodoContainerComponent);
-//
-// export default cClass;
