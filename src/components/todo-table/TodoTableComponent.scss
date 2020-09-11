@@ -1,28 +1,56 @@
-.todo-table-container {
-  overflow: auto;
-  padding: 3px 15px;
-  margin: 15px 0;
+.todo-table-section {
+  display: flex;
+  max-height: 50%;
 
-  .todo-table {
-    display: table;
-    position: relative;
-    width: 100%;
-    table-layout: fixed;
+  .side-area {
+    width: 15%
+  }
 
-    .heading {
-      display: table-row;
-      font-weight: bold;
-      text-align: center;
-    }
+  .center-area {
+    width: 70%;
+    display: flex;
 
-    .cell {
-      display: table-cell;
-      border: thin solid;
-      padding-left: 5px;
-      padding-right: 5px;
-      min-width: 190px;
-      text-align: center;
+    .todo-table-container {
+      overflow: auto;
+      padding: 3px 15px;
+      margin: 1vmin 0;
+
+      .todo-table {
+        display: table;
+        position: relative;
+        width: 100%;
+        table-layout: fixed;
+
+        .heading {
+          display: table-row;
+          font-weight: bold;
+          text-align: center;
+        }
+
+        .cell {
+          display: table-cell;
+          border: thin solid;
+          padding-left: 5px;
+          padding-right: 5px;
+          min-width: 190px;
+          text-align: center;
+          word-break: break-word;
+        }
+      }
     }
   }
 
+  .counters {
+    display: flex;
+    flex-direction: column;
+
+    .badge-container {
+      margin: 3px 0 0 0;
+    }
+
+    div {
+      margin: 2vmin 2.5vmin 0 2.5vmin;
+    }
+  }
 }
+

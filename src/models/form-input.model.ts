@@ -1,6 +1,6 @@
-export interface FormInputModel<T = string> {
+export interface FormInputModel<T = string, V = any> {
   label: string;
   name: T;
-  value: any;
-  type: string;
+  value: V;
+  type: 'text' | 'checkbox';
 }

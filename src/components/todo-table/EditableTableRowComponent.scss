@@ -1,11 +1,14 @@
 .editable-table-row-container {
+  display: table-row-group;
   position: relative;
-  display: contents;
   transition: all .1s ease-in-out;
   cursor: pointer;
 
+  &.edit-mode {
+    transform: scale(1.02);
+  }
+
   .edit-section {
-    transition: all .15s ease-in-out;
     z-index: 10;
     position: absolute;
     display: flex;
@@ -15,75 +18,83 @@
     background: darkgrey;
     top: 0;
     transform: translateY(-90%);
-    width: -moz-available;
     width: -webkit-fill-available;
-    width: fill-available;
-    opacity: 0;
     cursor: default;
     box-shadow: 0 0 14px -6px black;
+
+    &.bigger {
+      animation-duration: 0.3s;
+      animation-name: toBig;
+    }
+    &.smaller {
+      animation-duration: 0.75s;
+      animation-name: toSmall;
+    }
+    @keyframes toBig {
+      from { opacity: 0 }
+      to { opacity: 1 }
+    }
+    @keyframes toSmall {
+      from { opacity: 1 }
+      to { opacity: 0 }
+    }
   }
 
-  &.red .table-row {
-    animation-duration: 1.75s;
-    animation-name: toRed;
+  .form {
+    margin: 0.5vh;
   }
-  &.green .table-row {
-    animation-duration: 1.75s;
-    animation-name: toGreen;
+
+  .w-m-a {
+    width: -moz-available;
   }
-  @keyframes toRed {
-    from { background-color: rgba(255,0,26,0.05) }
-    to { background-color: initial }
-  }
-  @keyframes toGreen {
-    from { background-color: rgba(178,255,202,0.16) }
-    to { background-color: initial }
+
+  .w-f-a {
+    width: fill-available;
   }
 
   .buttons-container {
     display: flex;
     align-items: center;
-  }
-  .todo-button {
-    margin: 0 10px;
-  }
-  .button-icon {
-    width: 23px;
-    margin-right: 10px;
-    display: none;
-  }
-  .save-icon {
-    width: 20px;
-  }
-  .todo-button, .button-icon {
-    transition: all .15s ease-in-out;
-  }
-  .button-icon:hover {
-    transform: scale(1.25);
-  }
 
-  .todo-button:hover {
-    transform: scale(1.1);
-  }
+    .popup-button {
+      margin: 0.5vmin 10px;
 
-  @media screen and (max-width: 1000px) {
-    .todo-button {
-      display: none;
+      &:hover {
+        transform: scale(1.1);
+      }
+
+      &-icon {
+        width: 3vmin;
+        margin-right: 2.5vmin;
+        display: none;
+
+        &.save-icon {
+          width: 2.8vmin;
+        }
+
+        &:hover {
+          transform: scale(1.25);
+        }
+      }
     }
-    .button-icon {
-      cursor: pointer;
-      display: initial;
+
+    .popup-button, .popup-button-icon {
+      transition: all .15s ease-in-out;
+    }
+
+    @media screen and (max-width: 1024px) {
+      .popup-button {
+        display: contents;
+
+        .button-label {
+          display: none;
+        }
+
+        &-icon {
+          cursor: pointer;
+          display: initial;
+        }
+      }
     }
   }
-
-}
-
-.edit-mode.editable-table-row-container {
-  transform: scale(1.02);
-}
-.edit-mode-popup .edit-section {
-  opacity: 1;
-}
-.edit-section todo-form {
-  margin: 10px;
 }

@@ -1,3 +1,20 @@
 .table-row {
   display: table-row;
+
+  &.red {
+    animation-duration: 1.75s;
+    animation-name: toRed;
+  }
+  &.green {
+    animation-duration: 1.75s;
+    animation-name: toGreen;
+  }
+  @keyframes toRed {
+    from { background-color: rgba(255,0,26,0.05) }
+    to { background-color: initial }
+  }
+  @keyframes toGreen {
+    from { background-color: rgba(178,255,202,0.16) }
+    to { background-color: initial }
+  }
 }

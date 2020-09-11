@@ -1,8 +1,9 @@
 .button {
+  display: flex;
   cursor: pointer;
   border: 1px solid cadetblue;
-  border-radius: 15px;
-  padding: 10px 15px;
+  border-radius: 3.5vmin;
+  padding: 1vmin 2.5vmin;
   background-color: aliceblue;
   outline: none;
 }
