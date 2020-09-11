@@ -50,7 +50,7 @@ export function observableConnect<
       componentWillUnmount() {
         observableState && observableState.unsubscribe();
         observableState = null;
-        super.componentWillUnmount?.();
+        super.componentWillUnmount && super.componentWillUnmount();
       }
     }
     return connected(WrappedComponent);
