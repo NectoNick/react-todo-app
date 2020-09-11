@@ -48,7 +48,7 @@ export function observableConnect<
   >(componentCtor: C) => {
     class WrappedComponent extends (componentCtor as ClassCtor<Component>) {
       componentWillUnmount() {
-        observableState?.unsubscribe();
+        observableState && observableState.unsubscribe();
         observableState = null;
         super.componentWillUnmount?.();
       }
